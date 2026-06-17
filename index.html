@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TANTU FOOTBALL - 野球足球智能分队系统</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #0B0F19;
+            --bg-card: #161B26;
+            --bg-card-active: #1F293D;
+            --accent-gold: #D4AF37;
+            --accent-gold-hover: #F3E5AB;
+            --text-title: #FFFFFF;
+            --text-main: #E2E8F0;
+            --text-muted: #64748B;
+            --border-color: #232D42;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding-bottom: 40px;
+            user-select: none;
+            line-height: 1.5;
+        }
+
+        .header {
+            background: linear-gradient(180deg, #111827 0%, #0B0F19 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px 16px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--text-title);
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            color: var(--accent-gold);
+            font-size: 11px;
+            letter-spacing: 4px;
+            margin-top: 4px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .container {
+            padding: 16px;
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            background: #111622;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+            color: #000000;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .form-group {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group h3 {
+            font-size: 16px;
+            color: var(--text-title);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .form-item {
+            margin-bottom: 16px;
+        }
+
+        .form-item label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 15px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-gold);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .pos-checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .pos-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            padding: 12px 0;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pos-btn.selected {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .stat-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-bar .count {
+            color: var(--accent-gold);
+            font-size: 18px;
+            font-weight: 700;
+            font-family: system-ui, sans-serif;
+        }
+
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .player-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .match-row-clickable {
+            cursor: pointer;
+        }
+
+        .player-card.registered {
+            background: var(--bg-card-active);
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: inset 0 0 12px rgba(212, 175, 55, 0.03);
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .player-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-title);
+        }
+
+        .player-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            background: var(--bg-main);
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .player-card.registered .tag-level {
+            color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.08);
+        }
+
+        .right-action-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .gk-switch-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px 8px;
+            background: var(--bg-main);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .gk-switch-label input {
+            cursor: pointer;
+        }
+        .player-card.registered .gk-switch-label-active {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .radio-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .player-card.registered .radio-icon {
+            border-color: var(--accent-gold);
+            background: var(--accent-gold);
+        }
+
+        .player-card.registered .radio-icon::after {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: #000000;
+            border-radius: 50%;
+        }
+
+        .delete-btn {
+            background: rgba(255, 77, 79, 0.1);
+            color: #FF4D4F;
+            border: 1px solid rgba(255, 77, 79, 0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .board-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .board-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        @media(min-width: 480px) {
+            .board-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .team-box {
+            background: #0B0F19;
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--border-color);
+            transition: border-color 0.2s;
+        }
+        .team-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .team-title-input-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .team-color-picker {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: transparent;
+        }
+        .team-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .team-color-picker::-webkit-color-swatch { border: 1px solid var(--border-color); border-radius: 50%; }
+        
+        .team-name-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed var(--text-muted);
+            color: var(--text-title);
+            font-size: 15px;
+            font-weight: 700;
+            width: 110px;
+            outline: none;
+            padding: 2px 0;
+        }
+        .team-name-input:focus {
+            border-bottom-color: var(--accent-gold);
+        }
+        .team-power-badge {
+            font-size: 11px;
+            background: var(--bg-card);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+        .team-power-badge span {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+        .drag-list-container {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(0,0,0,0.15);
+            padding: 6px;
+            border-radius: 6px;
+        }
+        .draggable-player-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: grab;
+            transition: transform 0.1s;
+        }
+        .draggable-player-item:active { cursor: grabbing; }
+        .draggable-player-item.selected-for-swap {
+            border-color: var(--accent-gold);
+            background: var(--bg-card-active);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+        .drag-ghost-class {
+            opacity: 0.4;
+            background: var(--accent-gold) !important;
+        }
+        .board-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .btn-sm {
+            padding: 10px;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        .output-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .result-box {
+            color: #FFFFFF;
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+            white-space: pre;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            background: #0B0F19;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 16px 0 10px 4px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .search-wrapper {
+            margin-bottom: 14px;
+        }
+        .match-info-form {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .match-info-form h3 {
+            font-size: 15px;
+            color: var(--text-title);
+            margin-bottom: 14px;
+            border-left: 3px solid var(--accent-gold);
+            padding-left: 8px;
+        }
+        .match-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .match-form-grid .full-row {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>TANTU FOOTBALL</h1>
+        <p>野球足球智能分队系统</p>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-match')">赛事分队</button>
+            <button class="tab-btn" onclick="switchTab('tab-players')">大名单数据中心</button>
+        </div>
+
+        <div id="tab-match" class="tab-content active">
+            <div class="match-info-form">
+                <h3>📋 赛事基础信息配置</h3>
+                <div class="match-form-grid">
+                    <div class="form-item">
+                        <label>比赛时间</label>
+                        <input type="text" id="m-time" class="form-control" placeholder="如: 1月1日 20:00-22:00">
+                    </div>
+                    <div class="form-item">
+                        <label>比赛场地</label>
+                        <input type="text" id="m-venue" class="form-control" placeholder="球场地址">
+                    </div>
+                    <div class="form-item">
+                        <label>比赛物资</label>
+                        <input type="text" id="m-supplies" class="form-control" placeholder="打米/牛奶等">
+                    </div>
+                    <div class="form-item">
+                        <label>赛事裁判</label>
+                        <input type="text" id="m-referee" class="form-control" placeholder="主裁判/编外监督">
+                    </div>
+                    <div class="form-item">
+                        <label>赛事直播</label>
+                        <input type="text" id="m-live" class="form-control" placeholder="直播工作人员/无">
+                    </div>
+                    <div class="form-item">
+                        <label>赛制时间</label>
+                        <input type="text" id="m-stage-count" class="form-control" value="2节制 (每节35分钟)" placeholder="例如: 2节制 / 3节(每节20分钟)">
+                    </div>
+                    <div class="form-item" style="display:none;">
+                        <select id="m-format" class="form-control"><option value="8" selected></option></select>
+                    </div>
+                    <div class="form-item full-row" style="margin-bottom: 0;">
+                        <label>赛事备注</label>
+                        <input type="text" id="m-remark" class="form-control" placeholder="费用/注意事项说明">
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-bar">
+                <div>已签到 <span id="reg-count" class="count">0</span> 人</div>
+                <div id="gk-count" style="color: var(--text-muted); font-weight: 500;">专属门将: 0</div>
+            </div>
+
+            <button class="btn btn-gold" onclick="processSmartBalanceDivide()">⚡ 开始智能战位平衡分队</button>
+            
+            <div id="interactive-board-section" class="board-wrapper" style="display: none;">
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">🔄 战局编排微调（支持拖拽或点击单选互调）</div>
+                
+                <div class="board-grid">
+                    <div class="team-box" id="box-teamA">
+                        <div class="team-meta-row">
+                            <div class="team-title-input-group">
+                                <input type="color" id="picker-teamA" class="team-color-picker" value="#FF4D4F" onchange="syncTeamStyle('A')">
+                                <input type="text" id="input-nameTeamA" class="team-name-input" value="红队">
+                            </div>
+                            <div class="team-power-badge">人数:<span id="badge-countA">0</span> | 战力:<span id="badge-powerA">0</span></div>
+                        </div>
+                        <div id="list-teamA" class="drag-list-container"></div>
+                    </div>
+
+                    <div class="team-box" id="box-teamB">
+                        <div class="team-meta-row">
+                            <div class="team-title-input-group">
+                                <input type="color" id="picker-teamB" class="team-color-picker" value="#1890FF" onchange="syncTeamStyle('B')">
+                                <input type="text" id="input-nameTeamB" class="team-name-input" value="蓝队">
+                            </div>
+                            <div class="team-power-badge">人数:<span id="badge-countB">0</span> | 战力:<span id="badge-powerB">0</span></div>
+                        </div>
+                        <div id="list-teamB" class="drag-list-container"></div>
+                    </div>
+                </div>
+
+                <div class="board-actions">
+                    <button class="btn btn-outline btn-sm" onclick="swapSelectedPlayers()">🔄 选中球员互调</button>
+                    <button class="btn btn-gold btn-sm" onclick="generateFinalExportText()">📝 确认并生成文本</button>
+                </div>
+            </div>
+
+            <div id="output-section" style="display: none;" class="output-wrapper">
+                <div class="result-box" id="result-text"></div>
+                <button class="btn btn-gold" style="margin-bottom:0;" onclick="copyResult()">📋 复制最终名单发至微信</button>
+            </div>
+
+            <div class="section-title">切客签到名单 (点击卡片签到 | 可选专属门将)</div>
+            
+            <div class="search-wrapper">
+                <input type="text" id="player-search-input" class="form-control" placeholder="🔍 输入球员姓名或档位(如: 2上)进行快速检索..." oninput="render()">
+            </div>
+
+            <div id="match-player-list" class="player-list"></div>
+        </div>
+
+        <div id="tab-players" class="tab-content">
+            <div class="form-group">
+                <h3>录入新转会球员</h3>
+                <div class="form-item">
+                    <label>姓名</label>
+                    <input type="text" id="p-name" class="form-control" placeholder="输入球员姓名">
+                </div>
+                <div class="form-item">
+                    <label>竞技核心档位</label>
+                    <select id="p-level" class="form-control">
+                        <option value="2.5">2档上 (核心顶尖)</option>
+                        <option value="2" selected>2档中 (主力常规)</option>
+                        <option value="1.5">2档下 (主力边缘)</option>
+                        <option value="3.5">3档上 (常规精锐)</option>
+                        <option value="3">3档中 (常规轮换)</option>
+                        <option value="3.1">3档下 (常规娱乐)</option>
+                        <option value="4.5">4档上</option>
+                        <option value="4">4档下</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label>体能储备</label>
+                    <select id="p-stamina" class="form-control">
+                        <option value="5">好 (全场飞奔)</option>
+                        <option value="3" selected>中 (稳定战力)</option>
+                        <option value="1">差 (体能瓶颈)</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label>速度爆发</label>
+                    <select id="p-speed" class="form-control">
+                        <option value="5">快 / 好</option>
+                        <option value="4">中上</option>
+                        <option value="3" selected>中</option>
+                        <option value="2">停滞</option>
+                        <option value="1">慢</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label>球场常驻战位 (可多选)</label>
+                    <div class="pos-checkbox-group">
+                        <div class="pos-btn" data-pos="GK" onclick="togglePosBtn(this)">GK</div>
+                        <div class="pos-btn" data-pos="DF" onclick="togglePosBtn(this)">DF</div>
+                        <div class="pos-btn" data-pos="MF" onclick="togglePosBtn(this)">MF</div>
+                        <div class="pos-btn" data-pos="FW" onclick="togglePosBtn(this)">FW</div>
+                    </div>
+                </div>
+                <button class="btn btn-gold" style="margin-bottom:0; margin-top:8px;" onclick="addPlayer()">💾 激活并保存球员</button>
+            </div>
+
+            <div class="section-title">大名单大数据库</div>
+            <div id="full-player-list" class="player-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const defaultPlayers = [
+            { id: "1", name: "上乾", level: 2, stamina: 3, speed: 4, positions: ["DF", "MF"], registered: false, matchGK: false },
+            { id: "2", name: "虎哥", level: 3.5, stamina: 1, speed: 1, positions: ["MF"], registered: false, matchGK: false },
+            { id: "3", name: "亚扁", level: 2, stamina: 3, speed: 3, positions: ["DF"], registered: false, matchGK: false },
+            { id: "4", name: "华杰", level: 2, stamina: 3, speed: 4, positions: ["FW"], registered: false, matchGK: false },
+            { id: "5", name: "汉辉", level: 2, stamina: 3, speed: 3, positions: ["DF", "MF"], registered: false, matchGK: false },
+            { id: "6", name: "华基", level: 2.5, stamina: 3, speed: 3, positions: ["MF", "FW"], registered: false, matchGK: false },
+            { id: "7", name: "春浴", level: 1.5, stamina: 5, speed: 4, positions: ["FW"], registered: false, matchGK: false },
+            { id: "8", name: "明总", level: 4.5, stamina: 1, speed: 1, positions: ["MF", "FW"], registered: false, matchGK: false },
+            { id: "9", name: "大尚", level: 1.5, stamina: 1, speed: 1, positions: ["GK", "FW"], registered: false, matchGK: false },
+            { id: "10", name: "华辉", level: 2, stamina: 5, speed: 3, positions: ["DF", "MF", "FW"], registered: false, matchGK: false },
+            { id: "11", name: "扁头", level: 2, stamina: 5, speed: 5, positions: ["DF"], registered: false, matchGK: false },
+            { id: "12", name: "飞鱼", level: 1.5, stamina: 1, speed: 2, positions: ["DF"], registered: false, matchGK: false },
+            { id: "13", name: "作伟", level: 2.5, stamina: 3, speed: 4, positions: ["DF", "MF"], registered: false, matchGK: false },
+            { id: "14", name: "烂勇", level: 3.5, stamina: 5, speed: 3, positions: ["GK", "DF"], registered: false, matchGK: false },
+            { id: "15", name: "亚许", level: 2, stamina: 1, speed: 3, positions: ["FW"], registered: false, matchGK: false },
+            { id: "16", name: "二九", level: 2, stamina: 3, speed: 1, positions: ["DF"], registered: false, matchGK: false },
+            { id: "17", name: "荣杰", level: 2.5, stamina: 3, speed: 3, positions: ["MF"], registered: false, matchGK: false },
+            { id: "18", name: "鸡宇", level: 2, stamina: 5, speed: 3, positions: ["DF", "MF", "FW"], registered: false, matchGK: false },
+            { id: "19", name: "文祥庄", level: 3.5, stamina: 3, speed: 1, positions: ["DF"], registered: false, matchGK: false },
+            { id: "20", name: "润芳", level: 3, stamina: 1, speed: 1, positions: ["GK"], registered: false, matchGK: false },
+            { id: "21", name: "尚兴", level: 2, stamina: 3, speed: 3, positions: ["DF", "FW"], registered: false, matchGK: false },
+            { id: "22", name: "仲满", level: 2, stamina: 3, speed: 3, positions: ["MF"], registered: false, matchGK: false },
+            { id: "23", name: "金头", level: 3.5, stamina: 5, speed: 3, positions: ["DF"], registered: false, matchGK: false },
+            { id: "24", name: "亚伟", level: 3.1, stamina: 3, speed: 2, positions: ["DF"], registered: false, matchGK: false },
+            { id: "25", name: "BK", level: 2, stamina: 5, speed: 4, positions: ["DF", "MF", "FW"], registered: false, matchGK: false },
+            { id: "26", name: "上海", level: 4, stamina: 1, speed: 1, positions: ["DF"], registered: false, matchGK: false },
+            { id: "27", name: "路通", level: 3.5, stamina: 5, speed: 3, positions: ["DF", "MF", "FW"], registered: false, matchGK: false },
+            { id: "28", name: "二龙", level: 1.5, stamina: 3, speed: 2, positions: ["MF", "FW"], registered: false, matchGK: false },
+            { id: "29", name: "国振", level: 1.5, stamina: 5, speed: 3, positions: ["DF", "FW"], registered: false, matchGK: false },
+            { id: "30", name: "老池", level: 1.5, stamina: 3, speed: 3, positions: ["DF", "FW"], registered: false, matchGK: false },
+            { id: "31", name: "黎伯", level: 3.5, stamina: 1, speed: 1, positions: ["MF", "FW"], registered: false, matchGK: false },
+            { id: "32", name: "亚低", level: 1.5, stamina: 3, speed: 3, positions: ["DF", "FW"], registered: false, matchGK: false },
+            { id: "33", name: "亚春", level: 1.5, stamina: 5, speed: 4, positions: ["FW"], registered: false, matchGK: false },
+            { id: "34", name: "亚毅", level: 2, stamina: 5, speed: 5, positions: ["DF"], registered: false, matchGK: false },
+            { id: "35", name: "帝轩", level: 2, stamina: 5, speed: 5, positions: ["DF", "MF", "FW"], registered: false, matchGK: false },
+            { id: "36", name: "烂同", level: 2, stamina: 3, speed: 3, positions: ["MF", "FW"], registered: false, matchGK: false },
+            { id: "37", name: "姚超", level: 3.5, stamina: 3, speed: 2, positions: ["DF"], registered: false, matchGK: false },
+            { id: "38", name: "亚城", level: 2, stamina: 5, speed: 5, positions: ["DF", "FW"], registered: false, matchGK: false },
+            { id: "39", name: "标公", level: 3.5, stamina: 5, speed: 5, positions: ["FW"], registered: false, matchGK: false },
+            { id: "40", name: "亚明", level: 3, stamina: 1, speed: 3, positions: ["GK"], registered: false, matchGK: false },
+            { id: "41", name: "太杰", level: 2, stamina: 3, speed: 3, positions: ["MF", "FW"], registered: false, matchGK: false }
+        ];
+
+        let players = [];
+        let swapSelection = [];
+        const emojiNumbers = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "1️⃣1️⃣", "1️⃣2️⃣", "1️⃣3️⃣", "1️⃣4️⃣", "1️⃣5️⃣", "1️⃣6️⃣", "1️⃣7️⃣", "1️⃣8️⃣", "1️⃣9️⃣", "2️⃣0️⃣", "2️⃣1️⃣", "2️⃣2️⃣", "2️⃣3️⃣", "2️⃣4️⃣", "2️⃣5️⃣"];
+
+        window.onload = function() {
+            const localData = localStorage.getItem('yeqiu_football_players');
+            if (localData) {
+                players = JSON.parse(localData);
+            } else {
+                players = defaultPlayers;
+                saveToLocal();
+            }
+            render();
+            initDragAndDrop();
+            syncTeamStyle('A');
+            syncTeamStyle('B');
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('yeqiu_football_players', JSON.stringify(players));
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function togglePosBtn(el) {
+            el.classList.toggle('selected');
+        }
+
+        function calculateScore(p) {
+            return Math.round((6 - parseFloat(p.level)) * 40 + parseInt(p.stamina) * 5 + parseInt(p.speed) * 4);
+        }
+
+        function addPlayer() {
+            const name = document.getElementById('p-name').value.trim();
+            const level = parseFloat(document.getElementById('p-level').value);
+            const stamina = parseInt(document.getElementById('p-stamina').value);
+            const speed = parseInt(document.getElementById('p-speed').value);
+            const posEls = document.querySelectorAll('.pos-btn.selected');
+            const positions = Array.from(posEls).map(el => el.getAttribute('data-pos'));
+
+            if (!name) { alert('请输入球员姓名！'); return; }
+            if (positions.length === 0) { alert('请至少选择一个位置！'); return; }
+
+            const newPlayer = {
+                id: Date.now().toString(),
+                name, level, stamina, speed, positions,
+                registered: false, matchGK: false
+            };
+
+            players.unshift(newPlayer);
+            saveToLocal();
+            render();
+
+            document.getElementById('p-name').value = '';
+            document.querySelectorAll('.pos-btn').forEach(el => el.classList.remove('selected'));
+            alert(`成功激活并归档新球员: ${name}`);
+        }
+
+        function deletePlayer(id, e) {
+            e.stopPropagation();
+            if(confirm('确定将该球员从大名单彻底清除吗？')) {
+                players = players.filter(p => p.id !== id);
+                saveToLocal();
+                render();
+            }
+        }
+
+        function toggleRegister(id) {
+            players = players.map(p => {
+                if(p.id === id) p.registered = !p.registered;
+                return p;
+            });
+            saveToLocal();
+            render();
+        }
+
+        function toggleMatchGK(id, checkboxEl, event) {
+            event.stopPropagation();
+            players = players.map(p => {
+                if(p.id === id) {
+                    p.matchGK = checkboxEl.checked;
+                    if (p.matchGK) p.registered = true; 
+                }
+                return p;
+            });
+            saveToLocal();
+            render();
+        }
+
+        function getLevelLabel(level) {
+            if (level == 2.5) return "2档上";
+            if (level == 2) return "2档中";
+            if (level == 1.5) return "2档下";
+            if (level == 3.5) return "3档上";
+            if (level == 3) return "3档中";
+            if (level == 3.1) return "3档下";
+            if (level == 4.5) return "4档上";
+            if (level == 4) return "4档下";
+            return level + "档";
+        }
+
+        function render() {
+            const searchKeyword = document.getElementById('player-search-input').value.trim().toLowerCase();
+            const matchContainer = document.getElementById('match-player-list');
+            const fullContainer = document.getElementById('full-player-list');
+            
+            matchContainer.innerHTML = '';
+            fullContainer.innerHTML = '';
+
+            let registeredCount = 0;
+            let gkCount = 0;
+
+            players.forEach(p => {
+                if (p.registered) registeredCount++;
+                if (p.registered && p.matchGK) gkCount++;
+
+                const levelLabel = getLevelLabel(p.level);
+                const posTags = p.positions.map(pos => `<span class="tag">${pos}</span>`).join('');
+                const matchesSearch = p.name.toLowerCase().includes(searchKeyword) || levelLabel.toLowerCase().includes(searchKeyword);
+
+                if (matchesSearch) {
+                    const matchCard = document.createElement('div');
+                    matchCard.className = `player-card match-row-clickable ${p.registered ? 'registered' : ''}`;
+                    matchCard.onclick = () => toggleRegister(p.id);
+                    matchCard.innerHTML = `
+                        <div class="player-info">
+                            <div class="player-name-row">
+                                <span class="player-name">${p.name}</span>
+                                <span class="tag tag-level">${levelLabel}</span>
+                            </div>
+                            <div class="player-tags">${posTags}</div>
+                        </div>
+                        <div class="right-action-wrapper">
+                            <label class="gk-switch-label ${p.matchGK ? 'gk-switch-label-active' : ''}" onclick="event.stopPropagation();">
+                                <input type="checkbox" ${p.matchGK ? 'checked' : ''} onchange="toggleMatchGK('${p.id}', this, event)"> 门将
+                            </label>
+                            <div class="radio-icon"></div>
+                        </div>
+                    `;
+                    matchContainer.appendChild(matchCard);
+                }
+
+                const fullCard = document.createElement('div');
+                fullCard.className = 'player-card';
+                fullCard.innerHTML = `
+                    <div class="player-info">
+                        <div class="player-name-row">
+                            <span class="player-name">${p.name}</span>
+                            <span class="tag tag-level">${levelLabel}</span>
+                        </div>
+                        <div class="player-tags">
+                            ${posTags}
+                            <span class="tag">体能:${p.stamina}</span>
+                            <span class="tag">速度:${p.speed}</span>
+                            <span class="tag" style="color:var(--accent-gold)">战力:${calculateScore(p)}</span>
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="deletePlayer('${p.id}', event)">解约</button>
+                `;
+                fullContainer.appendChild(fullCard);
+            });
+
+            document.getElementById('reg-count').innerText = registeredCount;
+            document.getElementById('gk-count').innerText = `专属门将: ${gkCount}`;
+        }
+
+        function syncTeamStyle(teamLetter) {
+            const color = document.getElementById(`picker-teamA`).value;
+            const colorB = document.getElementById(`picker-teamB`).value;
+            document.getElementById('box-teamA').style.borderTopColor = color;
+            document.getElementById('box-teamB').style.borderTopColor = colorB;
+        }
+
+        function initDragAndDrop() {
+            const options = {
+                group: 'teamsSharedGroup',
+                animation: 180,
+                ghostClass: 'drag-ghost-class',
+                onEnd: function () {
+                    recalculateTeamStatsFromUI();
+                }
+            };
+            Sortable.create(document.getElementById('list-teamA'), options);
+            Sortable.create(document.getElementById('list-teamB'), options);
+        }
+
+        function processSmartBalanceDivide() {
+            const registered = players.filter(p => p.registered);
+            if (registered.length < 2) {
+                alert("当前签到人数不足以进行公平配平分队（至少需要2人）！");
+                return;
+            }
+
+            let gks = registered.filter(p => p.matchGK);
+            let fieldPlayers = registered.filter(p => !p.matchGK);
+
+            let teamA = [];
+            let teamB = [];
+
+            if (gks.length >= 2) {
+                gks.sort((a, b) => calculateScore(b) - calculateScore(a));
+                for (let i = 0; i < gks.length; i++) {
+                    if (i % 2 === 0) teamA.push(gks[i]);
+                    else teamB.push(gks[i]);
+                }
+            } else {
+                fieldPlayers.push(...gks);
+            }
+
+            fieldPlayers.sort((a, b) => calculateScore(b) - calculateScore(a));
+
+            fieldPlayers.forEach(player => {
+                let diff = getTeamTotalScore(teamA) - getTeamTotalScore(teamB);
+                if (diff > 0) {
+                    if (teamA.length <= teamB.length) {
+                        teamA.push(player);
+                    } else {
+                        teamB.push(player);
+                    }
+                } else if (diff < 0) {
+                    if (teamB.length <= teamA.length) {
+                        teamB.push(player);
+                    } else {
+                        teamA.push(player);
+                    }
+                } else {
+                    if (teamA.length <= teamB.length) teamA.push(player);
+                    else teamB.push(player);
+                }
+            });
+
+            renderBoardList('list-teamA', teamA);
+            renderBoardList('list-teamB', teamB);
+
+            document.getElementById('interactive-board-section').style.display = 'block';
+            document.getElementById('output-section').style.display = 'none';
+            
+            recalculateTeamStatsFromUI();
+            swapSelection = [];
+            
+            document.getElementById('interactive-board-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function getTeamTotalScore(teamArray) {
+            return teamArray.reduce((sum, p) => sum + calculateScore(p), 0);
+        }
+
+        function renderBoardList(containerId, teamArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            teamArray.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'draggable-player-item';
+                item.setAttribute('data-id', p.id);
+                item.onclick = () => handleBoardItemClick(item, p.id);
+                
+                let positionBadge = p.matchGK ? 'GK' : (p.positions[0] || 'MF');
+                let displayLevel = getLevelLabel(p.level).replace("档", "");
+
+                item.innerHTML = `
+                    <span style="font-weight:600; color:var(--text-title);">${p.name} <span style="font-size:11px; color:var(--text-muted); font-weight:normal;">(${displayLevel})</span></span>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span class="tag" style="background:var(--bg-main); font-size:10px;">${positionBadge}</span>
+                        <span style="font-family:monospace; font-size:12px; color:var(--accent-gold); font-weight:700;">${calculateScore(p)}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function handleBoardItemClick(element, id) {
+            if (element.classList.contains('selected-for-swap')) {
+                element.classList.remove('selected-for-swap');
+                swapSelection = swapSelection.filter(item => item.id !== id);
+            } else {
+                if (swapSelection.length >= 2) {
+                    alert("单选对调最多只能同时选中2名球员！");
+                    return;
+                }
+                element.classList.add('selected-for-swap');
+                swapSelection.push({ id, element });
+            }
+        }
+
+        function swapSelectedPlayers() {
+            if (swapSelection.length !== 2) {
+                alert("请先在上方阵营中分别点击选中2位想要互换的球员！");
+                return;
+            }
+            const item1 = swapSelection[0].element;
+            const item2 = swapSelection[1].element;
+            
+            const parent1 = item1.parentNode;
+            const parent2 = item2.parentNode;
+            
+            const next1 = item1.nextSibling;
+            const next2 = item2.nextSibling;
+            
+            parent1.insertBefore(item2, next1);
+            parent2.insertBefore(item1, next2);
+
+            item1.classList.remove('selected-for-swap');
+            item2.classList.remove('selected-for-swap');
+            swapSelection = [];
+            
+            recalculateTeamStatsFromUI();
+        }
+
+        function recalculateTeamStatsFromUI() {
+            let totalPowerA = 0;
+            let countA = 0;
+            document.querySelectorAll('#list-teamA .draggable-player-item').forEach(el => {
+                const id = el.getAttribute('data-id');
+                const p = players.find(x => x.id === id);
+                if(p) { totalPowerA += calculateScore(p); countA++; }
+            });
+
+            let totalPowerB = 0;
+            let countB = 0;
+            document.querySelectorAll('#list-teamB .draggable-player-item').forEach(el => {
+                const id = el.getAttribute('data-id');
+                const p = players.find(x => x.id === id);
+                if(p) { totalPowerB += calculateScore(p); countB++; }
+            });
+
+            document.getElementById('badge-countA').innerText = countA;
+            document.getElementById('badge-powerA').innerText = totalPowerA;
+            document.getElementById('badge-countB').innerText = countB;
+            document.getElementById('badge-powerB').innerText = totalPowerB;
+        }
+
+        function getTeamArrayFromUI(listContainerId) {
+            let arr = [];
+            document.querySelectorAll(`#${listContainerId} .draggable-player-item`).forEach(el => {
+                const id = el.getAttribute('data-id');
+                const p = players.find(x => x.id === id);
+                if(p) arr.push(p);
+            });
+            return arr;
+        }
+
+        function getColorEmoji(hexColor) {
+            hexColor = hexColor.toUpperCase();
+            const r = parseInt(hexColor.substr(1, 2), 16);
+            const g = parseInt(hexColor.substr(3, 2), 16);
+            const b = parseInt(hexColor.substr(5, 2), 16);
+
+            if (r > 200 && g < 80 && b < 80) return "🔴";
+            if (r < 80 && g < 150 && b > 200) return "🔵";
+            if (r > 200 && g > 180 && b < 80) return "🟡";
+            if (r < 80 && g > 150 && b < 100) return "🟢";
+            if (r > 150 && g < 50 && b > 150) return "🟣";
+            if (r > 220 && g > 120 && b < 50) return "🟠";
+            if (r < 60 && g < 60 && b < 60) return "⚫";
+            if (r > 210 && g > 210 && b > 210) return "⚪";
+            
+            if (r >= g && r >= b) return "🔴";
+            if (b >= r && b >= g) return "🔵";
+            return "🟢";
+        }
+
+        function getStringVisualLength(str) {
+            let length = 0;
+            for (let i = 0; i < str.length; i++) {
+                let code = str.charCodeAt(i);
+                if (code >= 0 && code <= 128) {
+                    length += 1;
+                } else {
+                    length += 2;
+                }
+            }
+            return length;
+        }
+
+        function padStringVisual(str, targetLength) {
+            let currentLen = getStringVisualLength(str);
+            if (currentLen >= targetLength) return str;
+            return str + " ".repeat(targetLength - currentLen);
+        }
+
+        function sortTeamByPowerAndGK(teamArray) {
+            let gks = teamArray.filter(p => p.matchGK);
+            let fields = teamArray.filter(p => !p.matchGK);
+
+            fields.sort((a, b) => calculateScore(b) - calculateScore(a));
+            gks.sort((a, b) => calculateScore(b) - calculateScore(a));
+
+            return [...fields, ...gks];
+        }
+
+        function generateFinalExportText() {
+            const time = document.getElementById('m-time').value || "未定";
+            const venue = document.getElementById('m-venue').value || "未定";
+            const supplies = document.getElementById('m-supplies').value || "自备";
+            const referee = document.getElementById('m-referee').value || "无";
+            const live = document.getElementById('m-live').value || "无";
+            const stageCount = document.getElementById('m-stage-count').value || "2节";
+            const remark = document.getElementById('m-remark').value || "无";
+
+            const emojiA = getColorEmoji(document.getElementById('picker-teamA').value);
+            const emojiB = getColorEmoji(document.getElementById('picker-teamB').value);
+
+            let rawNameA = document.getElementById('input-nameTeamA').value || "红队";
+            let rawNameB = document.getElementById('input-nameTeamB').value || "蓝队";
+            
+            const cleanName = (name) => name.replace(/[\u1F600-\u1F64F\u1F300-\u1F5FF\u1F680-\u1F6FF\u2600-\u26FF\u2700-\u27BF]/g, "").trim();
+            
+            const titleA = `${emojiA} ${cleanName(rawNameA)}`;
+            const titleB = `${emojiB} ${cleanName(rawNameB)}`;
+
+            const finalA = sortTeamByPowerAndGK(getTeamArrayFromUI('list-teamA'));
+            const finalB = sortTeamByPowerAndGK(getTeamArrayFromUI('list-teamB'));
+            const maxPlayers = Math.max(finalA.length, finalB.length);
+
+            let text = `⚽ 【TANTU 】足球赛事公告 ⚽\n`;
+            text += `━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            text += `📅 比赛时间：${time}\n`;
+            text += `📍 比赛场地：${venue}\n`;
+            text += `⏱️ 赛制时间：${stageCount}\n`;
+            text += `🥛 比赛物资：${supplies}\n`;
+            text += `🏁 赛事裁判：${referee}\n`;
+            text += `🎥 赛事直播：${live}\n`;
+            if(remark && remark !== "无") text += `📝 赛事备注：${remark}\n`;
+            
+
+            let headA = `${titleA}(${finalA.length}人)`;
+            let headB = `${titleB}(${finalB.length}人)`;
+            
+            // 优化微信排版宽度，收紧核心列间距
+            const leftColumnTargetWidth = 14; 
+
+            text += padStringVisual(headA, leftColumnTargetWidth) + " ❘  " + headB + "\n";
+            text += "─────────── ❘ ───────────\n";
+
+            for (let i = 0; i < maxPlayers; i++) {
+                let leftItemText = "";
+                let rightItemText = "";
+                let numIcon = emojiNumbers[i + 1] || `${i + 1}.`;
+
+                if (i < finalA.length) {
+                    let pA = finalA[i];
+                    let gkFlagA = pA.matchGK ? " 🥅" : "";
+                    leftItemText = `${numIcon}${pA.name}${gkFlagA}`;
+                } else {
+                    leftItemText = " ";
+                }
+
+                if (i < finalB.length) {
+                    let pB = finalB[i];
+                    let gkFlagB = pB.matchGK ? " 🥅" : "";
+                    rightItemText = `${numIcon}${pB.name}${gkFlagB}`;
+                }
+
+                text += padStringVisual(leftItemText, leftColumnTargetWidth) + " ❘  " + rightItemText + "\n";
+            }
+
+            text += `━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            text += `💡 温馨提示：请各队球员准时到场，祝比赛愉快！`;
+
+            const outputBox = document.getElementById('result-text');
+            outputBox.innerText = text;
+            
+            document.getElementById('output-section').style.display = 'block';
+            document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyResult() {
+            const text = document.getElementById('result-text').innerText;
+            if(!text) return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert("紧凑精美版名单已成功复制！快去微信群粘贴吧！");
+            }).catch(err => {
+                alert("复制失败，请手动长选文本复制。");
+            });
+        }
+    </script>
+</body>
+</html>
